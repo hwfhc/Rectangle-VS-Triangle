@@ -270,7 +270,9 @@ class Shape{
         *求出l1，l2所在直线的交点
         *然后判断该交点是否在4个顶点形成的四边形内
         */
-       var x;
+       var x,y;
+
+       var k1,k2,b1,b2;
 
        var center1_X = node11.shape.center.GetX();
        var center1_Y = node11.shape.center.GetY();
@@ -289,7 +291,7 @@ class Shape{
        //特殊判断斜率不存在的情况
        if(x12 == x11 || x22 == x21)
        {
-         //情况1
+         //情况1，l1、l2均垂直
          if(x12 == x11 && x22 == x21){
            if(x12 == x22){
              if( ( y21 <= max(y11,y12) && y21 >= min(y11,y12) ) || ( y22 <= max(y11,y12) && y22 >= min(y11,y12) ) ){
@@ -300,36 +302,41 @@ class Shape{
              return false;
            }
          }
-         //情况2
+         //情况2，l1垂直
          if(x12 == x11){
+            k2 = ( y22 - y21 ) / ( x22 - x21 );
+            b2 = y22 - k2 * x22;
             x = x12;
+            y = k2 * x + b2;
          }
-         //情况3
+         //情况3，l2垂直
          if(x22 == x21){
+           k1 = ( y12 - y11 ) / ( x12 - x11 );
+           b1 = y12 - k1 * x12;
            x = x22;
+           y = k1 * x + b1;
          }
 
-         if( x <= max(x11,x12) && x >= min(x11,x12) && x <= max(x21,x22) && x >= min(x21,x22) ){
+         if( y <= max(y11,y12) && y >= min(y11,y12) && y <= max(y21,y22) && y >= min(y21,y22) ){
            return true;
          }
        }
 
        //斜率不为0
-       var k1 = ( y12 - y11 ) / ( x12 - x11 );
-       var k2 = ( y22 - y21 ) / ( x22 - x21 );
+       k1 = ( y12 - y11 ) / ( x12 - x11 );
+       k2 = ( y22 - y21 ) / ( x22 - x21 );
        if(k1 == k2)//判断两条线段是否平行
        {
          return false;
        }
 
-       var b1 = y12 - k1 * x12;
-       var b2 = y22 - k2 * x22;
+       b1 = y12 - k1 * x12;
+       b2 = y22 - k2 * x22;
 
        //求出交点x坐标
        x = (b2 - b1 ) / ( k1 - k2 );
 
        //判断交点是否在四边形内
-      // console.log(max(x11,x12),min(x11,x12),max(x21,x22),min(x21,x22));
        if( x <= max(x11,x12) && x >= min(x11,x12) && x <= max(x21,x22) && x >= min(x21,x22) ){
          return true;
        }
@@ -694,8 +701,10 @@ function init(){
     //碰撞检测
     layer.shapes[0].IsFilled = false;
     for(let i=1;i<layer.shapes.length;i++){
+      layer.shapes[i].IsFilled = false;
       if( layer.shapes[0].IsCrashed(layer.shapes[i]) ){
-        layer.shapes[0].IsFilled = true;
+         layer.shapes[0].IsFilled = true;
+         layer.shapes[i].IsFilled = true;
       }
     }
 
