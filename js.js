@@ -1,19 +1,41 @@
-const PI = 3.14159;
+//**************************数学常量**********************************************
+const PI = 3.1415926;
+const sin1 = sin(PI/180);
+const cos1 = cos(PI/180);
+const sin2 = sin(PI/90);
+const cos2 = cos(PI/90);
 
-//计算正余弦
 function cos(angle){
+ /*
+  *效果说明：
+  *计算角度的余弦值，角度越大精度越差
+  *
+  *计算方法:
+  *cos函数的麦克劳林展开
+  */
   var value;
-  value = 1-angle*angle/2+angle*angle*angle*angle/24;
+  value = 1-power(angle,2)/2+power(angle,4)/24;
   return value;
 }
 
 function sin(angle){
+  /*
+   *效果说明：
+   *计算角度的余弦值，角度越大精度越差
+   *
+   *计算方法:
+   *cos函数的麦克劳林展开
+   */
   var value;
-  value = angle-angle*angle*angle/6+angle*angle*angle*angle*angle/120;
+  value = angle-power(angle,3)/6+power(angle,5)/120;
   return value;
 }
 
 function max(N1,N2){
+  /*
+   *效果说明：
+   *求N1，N2最小值
+   */
   if(N1 >= N2){
     return N1;
   }
@@ -23,12 +45,36 @@ function max(N1,N2){
 }
 
 function min(N1,N2){
+ /*
+  *效果说明：
+  *求N1，N2最小值
+  */
   if(N1 <= N2){
     return N1;
   }
   else{
     return N2;
   }
+}
+
+function power(number,N){
+ /*
+  *效果说明:
+  *求number的N次方
+  */
+  if(N == 2)
+  {
+    return number * number;
+  }
+
+  if(N % 2 == 0){
+    return power(power(number,N / 2 ),2);
+
+  }
+  else{
+    return number * power(number,N-1);
+  }
+
 }
 
 //**************************矩阵**********************************************
@@ -151,30 +197,30 @@ class Matrix{
 //**************************图形**********************************************
 
 class Shape{
-  constructor(){
+  constructor(center,nodes){
     /*
-     *效果说明:
-     *center：图形的中心
-     *nodes：图形的各个节点
-     *layer：图形对应的图层,指定图层后才有值
+     *参数说明：
+     *center：图形的中心(数组，第一项为X坐标，第二项为Y坐标)
+     *nodes：图形的各个节点(数组，第一、二项为第一个节点坐标，以此类推)
      *
-     *参数数目不固定
-     *参数1，参数2:Shape的中心坐标
-     *参数3，参数4：第一个节点的X,Y偏移
-     *~~~~~~~~
+     *属性说明：
+     *center：图形的中心
+     *nodes[]：图形的各个节点
+     *layer：图形对应的图层,指定图层后才有值
+     *IsFilled：在图层绘画时指示该图形是否填充
+     *
      */
 
-      //i指示nodes[]第几项，i0指示arguments[]第几项
+      //i指示this.nodes[]第几项，i0指示nodes[]第几项
       var i,i0;
 
-      this.center = new Node(arguments[0],arguments[1],this);
+      this.center = new Node(center[0],center[1],this);
       this.nodes = [];
       this.layer;
-      this.linshi = false;//！！！！
+      this.IsFilled = false;
 
-      for(i=0,i0=2;i0<arguments.length;i0+=2){
-         this.nodes[i] = new Node(arguments[i0],arguments[i0+1],this);
-         i++;
+      for(i=0,i0=0;i0<nodes.length;i++,i0+=2){
+         this.nodes[i] = new Node(nodes[i0],nodes[i0+1],this);
       }
   }
 
@@ -205,14 +251,14 @@ class Shape{
        }
     }
 
-  IsColision(shape){
+  IsCrashed(shape){
     /*
      *效果说明:
      *判断本图形与另一图形是否碰撞
      *若碰撞则返回true,否则返回false
      */
 
-     function IsTwoLineIntersection(node11,node12,node21,node22)
+     function IsTwoLineIntersected(node11,node12,node21,node22)
      {
        /*
         *效果说明:
@@ -224,6 +270,8 @@ class Shape{
         *求出l1，l2所在直线的交点
         *然后判断该交点是否在4个顶点形成的四边形内
         */
+       var x;
+
        var center1_X = node11.shape.center.GetX();
        var center1_Y = node11.shape.center.GetY();
        var center2_X = node22.shape.center.GetX();
@@ -238,6 +286,35 @@ class Shape{
        var x22 = node22.GetX() + center2_X;
        var y22 = node22.GetY() + center2_Y;
 
+       //特殊判断斜率不存在的情况
+       if(x12 == x11 || x22 == x21)
+       {
+         //情况1
+         if(x12 == x11 && x22 == x21){
+           if(x12 == x22){
+             if( ( y21 <= max(y11,y12) && y21 >= min(y11,y12) ) || ( y22 <= max(y11,y12) && y22 >= min(y11,y12) ) ){
+               return true;
+             }
+           }
+           else{
+             return false;
+           }
+         }
+         //情况2
+         if(x12 == x11){
+            x = x12;
+         }
+         //情况3
+         if(x22 == x21){
+           x = x22;
+         }
+
+         if( x <= max(x11,x12) && x >= min(x11,x12) && x <= max(x21,x22) && x >= min(x21,x22) ){
+           return true;
+         }
+       }
+
+       //斜率不为0
        var k1 = ( y12 - y11 ) / ( x12 - x11 );
        var k2 = ( y22 - y21 ) / ( x22 - x21 );
        if(k1 == k2)//判断两条线段是否平行
@@ -249,9 +326,10 @@ class Shape{
        var b2 = y22 - k2 * x22;
 
        //求出交点x坐标
-       var x = (b2 - b1 ) / ( k1 - k2 );
+       x = (b2 - b1 ) / ( k1 - k2 );
 
-       //判断交点是否在四边形内(只需要判断x在node11和node12的x坐标，node21和22的x坐标之间)
+       //判断交点是否在四边形内
+      // console.log(max(x11,x12),min(x11,x12),max(x21,x22),min(x21,x22));
        if( x <= max(x11,x12) && x >= min(x11,x12) && x <= max(x21,x22) && x >= min(x21,x22) ){
          return true;
        }
@@ -287,7 +365,7 @@ class Shape{
            node22 = shape.nodes[0]
          }
 
-         if( IsTwoLineIntersection(node11,node12,node21,node22) )
+         if( IsTwoLineIntersected(node11,node12,node21,node22) )
          {
            return true;
          }
@@ -401,10 +479,6 @@ class Layer{
         //绘图部分
         ctx.beginPath();
 
-        //绘画中心，早晚删掉
-        ctx.moveTo(shape.center.GetX()-2,shape.center.GetY());
-        ctx.lineTo(shape.center.GetX()+2,shape.center.GetY()+0);
-
         ctx.moveTo(shape.center.GetX()+shape.nodes[i].GetX(),shape.center.GetY()+shape.nodes[i].GetY());
         for(i=1;i<shape.nodes.length;i++)
         {
@@ -412,7 +486,7 @@ class Layer{
         }
         ctx.closePath();
         ctx.lineWidth = 3;
-        if(shape.linshi)//！！！！
+        if(shape.IsFilled)
         {
           ctx.fill();
         }
@@ -433,3 +507,214 @@ class Layer{
     ctx.clearRect(0,0,canvas.width,canvas.height);
   }
 }
+
+//**************************逻辑控制**********************************************
+
+var layer;
+
+//主图形
+function Mainshape_Init(){
+  //循环变换图形
+  function auto(){
+    shape.Transformation(M,1);
+  }
+
+  //创建shape，及对应的变换矩阵
+  var shape = new Shape(
+    [400,400],
+    [-14,-14,
+    14,-14,
+    20,14,
+    -20,14]);
+  var M = new Matrix([
+      [cos1,-sin1,0],
+      [sin1, cos1,0],
+      [0, 0,1]
+    ]);//每秒绕中心逆时针旋转1°
+
+  //将shape添加到layer
+  layer.AddShape(shape);
+
+  //启动计时器
+  setInterval(auto,50);
+}
+
+function MouseMove(e){
+   var player = layer.shapes[0];
+   //获取canvas绝对位置
+   var X = content.getBoundingClientRect().left+document.body.scrollLeft;
+   var Y = content.getBoundingClientRect().top+document.body.scrollTop;
+
+   //获取鼠标在canvas中的坐标
+   var e = window.event;
+   var scrollX = document.body.scrollLeft;
+   var scrollY = document.body.scrollTop;
+   var x = e.clientX + scrollX - X;
+   var y = e.clientY + scrollY - Y;
+
+   var translate = new Matrix([
+      [1,0,0],
+      [0,1,0],
+      [x - layer.shapes[0].center.GetX(),y - player.center.GetY(),1]
+    ]);
+
+    player.Transformation(translate,0);
+}
+
+//图形1
+function shape1_Init(){
+  //循环变换图形
+  var count = 0;//判断变换次数
+  function auto(){
+    shape.Transformation(M,0);
+
+    if(count > 190){
+      clearInterval(timer);
+    }
+    count++;
+  }
+
+  //创建图形及对应变换
+  var shape = new Shape(
+    [200,200],
+    [-100,0,
+      0,100,
+     0,0]);
+  //每秒向右上方移动
+  var M = new Matrix([
+    [1,0,0],
+    [0,1,0],
+    [1,-1,1]
+  ]);
+
+  //将shape添加到layer
+  layer.AddShape(shape);
+
+  //启动计时器
+  var timer = setInterval(auto,50);
+}
+//图形2
+function shape2_Init(){
+  //循环变换图形
+  function auto(){
+    shape.Transformation(M,1);
+  }
+
+  //创建图形及对应变换
+  var shape = new Shape(
+    [400,400],
+    [0,50,
+    -100,50,
+    -100,-50,
+    -10,-10,
+     40,-120,
+      80,-10,
+      60,50]);
+  //每秒原地自转2°
+  var M = new Matrix([
+    [cos2,sin2,0],
+    [-sin2,cos2,0],
+    [0,0,1]
+  ]);
+
+  //将shape添加到layer
+  layer.AddShape(shape);
+
+  //启动计时器
+  setInterval(auto,50);
+}
+//图形3
+function shape3_Init(){
+  //循环变换图形
+  function auto(){
+    shape.Transformation(M,1);
+  }
+
+  //创建图形及对应变换
+  var shape = new Shape(
+    [400,400],
+    [0,-50,
+    -40,30,
+    -20,50,
+      0,20,
+     20,50,
+     40,30]);
+  //位移同时再绕中心旋转
+  var M = new Matrix([
+    [cos1,sin1,0],
+    [-sin1,cos1,0],
+    [-1,1,1]
+  ]);
+
+  //将shape添加到layer
+  layer.AddShape(shape);
+
+  //启动计时器
+  setInterval(auto,50);
+}
+//图形4
+function shape4_Init(){
+  //循环变换图形
+  var count = 0;
+  function auto(){
+    shape.Transformation(M,1);
+
+    if(count > 50)
+    {
+      clearInterval(timer);
+    }
+    count++;
+  }
+
+  //创建图形及对应变换
+  var shape = new Shape(
+    [650,200],
+    [ 0,-150,
+    -20,-20,
+    -60,-20,
+    -60,20,
+    60,-20]);
+  var M = new Matrix([
+    [1,0,0],
+    [-sin2,cos2,0],
+    [  -2,0,1]
+  ]);//每秒向右上方移动
+
+  //将shape添加到layer
+  layer.AddShape(shape);
+
+  //启动计时器
+  var timer = setInterval(auto,50);
+}
+
+//初始化
+function init(){
+  //循环绘图
+  function auto(){
+    //碰撞检测
+    layer.shapes[0].IsFilled = false;
+    for(let i=1;i<layer.shapes.length;i++){
+      if( layer.shapes[0].IsCrashed(layer.shapes[i]) ){
+        layer.shapes[0].IsFilled = true;
+      }
+    }
+
+    layer.Clear();
+    layer.Draw();
+  }
+
+  //创建layer
+  layer = new Layer(document.getElementById('content'));
+
+  //初始化各个图形
+  Mainshape_Init();
+  shape1_Init();
+  shape2_Init();
+  shape3_Init();
+  shape4_Init();
+
+  //启动计时器
+  setInterval(auto,50);
+}
+
+init();

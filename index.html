@@ -5,80 +5,14 @@
     <title>方块大战三角形</title>
 
     <link rel="stylesheet" href="style.css">
-    <script src="js.js"></script>
 </head>
 <body>
 
-<canvas id="content" width="800" height="1200" onmousemove="myFunction(event)">
+<canvas id="content" width="800" height="600" onmousemove="MouseMove(event)">
   <!--canvas的这俩width和height是他的属性，和其他元素的不一样，要是后面加上px会玄学-->
 </canvas>
+<script src="js.js"></script>
 
-<script>
-//初始化
-var layer = new Layer(document.getElementById('content'));
-var player = new Shape(400,400,
-  -14,-14,
-  14,-14,
-  20,14,
-  -20,14);
-var shape2 = new Shape(200,200,-100,0,0,100,0,0);
-layer.AddShape(player);
-layer.AddShape(shape2);
-layer.Draw();
-
-var move = new Matrix([
-  [1,0,0],
-  [0,1,0],
-  [1,-1,1]
-]);
-
-var sin1 = sin(PI/180);
-var cos1 = cos(PI/180);
-
-var rotate = new Matrix([
-  [cos1,-sin1,0],
-  [sin1, cos1,0],
-  [0, 0,1]
-]);
-
-//绘画
-function auto(){
-  if(player.IsColision(shape2)){
-    player.linshi = true;
-  }
-  else{
-    player.linshi = false;
-  }
-  layer.Clear();
-  shape2.Transformation(rotate,1);
-  layer.Draw();
-}
-
-setInterval(auto,50);
-
-//鼠标动作
-function myFunction(e) {
-   //获取canvas绝对位置
-   var X = content.getBoundingClientRect().left+document.body.scrollLeft;
-   var Y = content.getBoundingClientRect().top+document.body.scrollTop;
-
-   //获取鼠标在canvas中的坐标
-   var e = window.event;
-   var scrollX = document.body.scrollLeft;
-   var scrollY = document.body.scrollTop;
-   var x = e.clientX + scrollX - X;
-   var y = e.clientY + scrollY - Y;
-
-   var translate = new Matrix([
-      [1,0,0],
-      [0,1,0],
-      [x - player.center.GetX(),y - player.center.GetY(),1]
-    ]);
-
-    player.Transformation(translate,0);
-}
-
-</script>
 
 </body>
 </html>
