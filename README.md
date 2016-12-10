@@ -1,7 +1,7 @@
 # Rectangle-VS-Triangle
 方块大战三角形  
 
-##Content
+##Content(虽然还没做)
 整个绘画框  
 ####属性:
 + timer:  
@@ -32,7 +32,7 @@
 读取所有shape并绘制
 + clear:   
 清空本图层  
-+ AddShape(a1):
++ AddShape(center[],nodes[]):
 为图层添加一个shape，其后是shape初始化参数  
 + DeleteShape():  
 将Shape数组某项设为最后一项，并将最后一项设为undefined，并将Shape.length减一(将最后一项的图形移到要删除的项上)
@@ -47,9 +47,9 @@
 二维矩阵，代表一个向量，与中心左边想加得节点坐标
 + layer:  
 指向该Shape对应的图层  
-+ fill_style:  
++ fill_style(还没有):  
 说明shape内部填充方式  
-+ stroke_style:  
++ stroke_style(还没有):  
 说明shape线条样式  
 
 ####方法:
