@@ -32,7 +32,7 @@
 读取所有shape并绘制
 + clear:   
 清空本图层  
-+ AddShape(center[],nodes[]):
++ AddShape(center[],nodes[]):  
 为图层添加一个shape，其后是shape初始化参数  
 + DeleteShape():  
 将Shape数组某项设为最后一项，并将最后一项设为undefined，并将Shape.length减一(将最后一项的图形移到要删除的项上)
