@@ -237,13 +237,11 @@ class Shape{
     switch(pattern) {
         case 0:
             this.center.Transformation(M);
-          //!!!  this.layer.IsChanged = true;
             break;
         case 1:
             for(i=0;i<this.nodes.length;i++)
             {
               this.nodes[i].Transformation(M);
-            //!!!  this.layer.IsChanged = true;
             }
             break;
         default:
@@ -423,7 +421,6 @@ class Node{
     */
 
     this.value = this.value.Multiple(M);
-  //!!!  this.layer.IsChanged = true;
    }
 }
 
@@ -439,7 +436,6 @@ class Layer{
     */
     this.canvas = CANVAS;
     this.shapes = [];
-    this.IsChanged = false;
   }
 
   DeleteShape(N){
